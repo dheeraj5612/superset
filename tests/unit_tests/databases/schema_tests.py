@@ -120,20 +120,16 @@ def test_database_parameters_schema_mixin_no_engine(
             "database": "dbname",
         },
     }
-    try:
+    with pytest.raises(ValidationError) as exc_info:
         dummy_schema.load(payload)
-    except ValidationError as err:
-        assert (  # noqa: PT017
-            err.messages
-            == {  # noqa: PT017
-                "_schema": [
-                    (
-                        "An engine must be specified when passing individual parameters to "  # noqa: E501
-                        "a database."
-                    ),
-                ]
-            }
-        )
+    assert exc_info.value.messages == {
+        "_schema": [
+            (
+                "An engine must be specified when passing individual parameters to "
+                "a database."
+            ),
+        ]
+    }
 
 
 def test_database_parameters_schema_mixin_invalid_engine(
