@@ -214,6 +214,14 @@ class BaseReportScheduleCommand(BaseCommand):
         invalid_tab_ids = set(active_tabs) - set(position_data.keys())
 
         if anchor := dashboard_state.get("anchor"):
+            if not isinstance(anchor, str):
+                exceptions.append(
+                    ValidationError(
+                        _("extra.dashboard.anchor must be a string"),
+                        "extra",
+                    )
+                )
+                return
             try:
                 anchor_list: list[str] = json.loads(anchor)
                 if _invalid_tab_ids := set(anchor_list) - set(position_data.keys()):
