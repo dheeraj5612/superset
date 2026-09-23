@@ -167,11 +167,22 @@ def test_edge_cases():
         pd.DataFrame({"date": pd.to_datetime(["2023-01-01"])}),  # Already datetime
     ]
 
-    for df in edge_cases:
+    expected_values = [
+        [],
+        [pd.NaT, pd.NaT],
+        [pd.Timestamp("2023-01-01")],
+        [pd.Timestamp("2023-01-01")],
+    ]
+
+    for df, expected in zip(edge_cases, expected_values, strict=True):
         df_copy = df.copy()
         date_cols = (DateColumn(col_label="date"),)
         # Should not raise
         normalize_dttm_col(df_copy, date_cols)
+        assert pd.api.types.is_datetime64_any_dtype(df_copy["date"]), (
+            f"Expected datetime64 dtype, got {df_copy['date'].dtype}"
+        )
+        assert df_copy["date"].tolist() == expected
 
 
 def test_detect_datetime_format_empty_series():
